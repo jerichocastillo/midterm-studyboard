@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { registerSchema } from "@/lib/validations";
+import { error } from "console";
 
 // TODO (Step 4): POST /api/register — create a new user account.
 // Expected body: { name: string, email: string, password: string }
@@ -16,25 +18,20 @@ import { prisma } from "@/lib/prisma";
 //    never send the password hash back to the client.
 export async function POST(request: Request) {
   const body = await request.json();
-  const { name, email, password } = body;
 
-  if ( !name || !email || !password) {
-      return NextResponse.json(
-      { message: "Name, Email, and Password are all required fields" },
+  const parsedResponse =  registerSchema.safeParse(body);
+  if ( !parsedResponse.success ){
+    return NextResponse.json(
+      { error: parsedResponse.error.issues[0].message },
       { status: 400 }
-    );
+    )
   }
 
-  if ( password.length < 8 ) {
-  return NextResponse.json(
-      { message: "password must be at least 8 charaters" },
-      { status: 400 }
-    );
-  }
+  const { name, email, password } = parsedResponse.data;
 
   const existingUser = await prisma.user.findUnique({
-    where: {email}
-  })
+    where: { email }
+  });
 
   if ( existingUser ){
   return NextResponse.json(

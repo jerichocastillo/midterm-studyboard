@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getGroupById, updateGroup, deleteGroup } from "@/lib/data";
+import { updateGroupSchema } from "@/lib/validations";
 import { error } from "console";
+
 
 // GET /api/groups/:id — read one group. Stays PUBLIC — no changes needed.
 export async function GET(
@@ -40,6 +42,16 @@ export async function PATCH(
     );
   }
 
+  const body = await request.json();
+  const parsedResponse = updateGroupSchema.safeParse(body);
+  if ( !parsedResponse.success ){
+    return NextResponse.json(
+      { error: parsedResponse.error.issues[0].message },
+      { status: 400 }
+    )
+  } 
+
+
   const group = await getGroupById(params.id);
 
   if (!group){
@@ -56,7 +68,6 @@ export async function PATCH(
     );
   }
 
-  const body = await request.json();
   const updated = await updateGroup(params.id, body);
 
   if (!updated) {
