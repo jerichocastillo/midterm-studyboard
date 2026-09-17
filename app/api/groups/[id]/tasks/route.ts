@@ -6,7 +6,7 @@ import { createTaskSchema } from "@/lib/validations";
 
 // GET /api/groups/:id/tasks — list a group's tasks. Stays PUBLIC.
 export async function GET(
-  request: Request,
+  request: Request, 
   { params }: { params: { id: string } }
 ) {
   const group = await getGroupById(params.id);

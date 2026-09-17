@@ -39,7 +39,7 @@ export default function NewGroupForm() {
     }
 
     const newGroup = await response.json();
-    router.push(`/groups${newGroup.id}`)
+    router.push(`/groups/${newGroup.id}`)
   }
 
   return (
