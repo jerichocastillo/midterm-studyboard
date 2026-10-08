@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { redirect, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 
 const links = [
@@ -62,7 +62,7 @@ export default function Navbar() {
           <>
             <span className="text-gray-600">Hello, {session.user?.name} </span>
             <button 
-              onClick={() => signOut(redirect("/login"))}
+              onClick={() => signOut({ callbackUrl: "/login" })}
               className="text-gray-600 hover:text-blue-600"
             >
               Sign Out

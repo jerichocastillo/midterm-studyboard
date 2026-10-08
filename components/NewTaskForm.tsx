@@ -15,27 +15,28 @@ export default function NewTaskForm({ groupId }: { groupId: string }) {
     setError("");
     setIsSubmitting(true);
 
-    try {
-      const res = await fetch(`/api/groups/${groupId}/tasks`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title }),
-      });
+    const res = await fetch(`/api/groups/${groupId}/tasks`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title }),
+    }).catch(() => null);
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        setError(data.error ?? "Failed to add task.");
-        setIsSubmitting(false);
-        return;
-      }
-
-      setTitle("");
-      router.refresh();
-    } catch {
+    if (!res) {
       setError("Something went wrong. Please try again.");
-    } finally {
       setIsSubmitting(false);
+      return;
     }
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setError(data.error ?? "Failed to add task.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    setTitle("");
+    router.refresh();
+    setIsSubmitting(false);
   }
 
   return (

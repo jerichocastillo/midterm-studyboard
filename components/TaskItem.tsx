@@ -24,21 +24,16 @@ export default function TaskItem({
     const previous = done;
     const next = !done;
 
-    setDone(next); 
+    setDone(next);
     setError("");
 
-    try {
-      const res = await fetch(`/api/groups/${groupId}/tasks/${task.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ done: next }),
-      });
+    const res = await fetch(`/api/groups/${groupId}/tasks/${task.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ done: next }),
+    }).catch(() => null);
 
-      if (!res.ok) {
-        setDone(previous); 
-        setError("Failed to update task.");
-      }
-    } catch {
+    if (!res || !res.ok) {
       setDone(previous);
       setError("Failed to update task.");
     }
@@ -50,23 +45,23 @@ export default function TaskItem({
     setIsDeleting(true);
     setError("");
 
-    try {
-      const res = await fetch(`/api/groups/${groupId}/tasks/${task.id}`, {
-        method: "DELETE",
-      });
+    const res = await fetch(`/api/groups/${groupId}/tasks/${task.id}`, {
+      method: "DELETE",
+    }).catch(() => null);
 
-      if (!res.ok) {
-        setError("Failed to delete task.");
-        setIsDeleting(false);
-        return;
-      }
-
-  
-      router.refresh();
-    } catch {
+    if (!res) {
       setError("Failed to delete task.");
       setIsDeleting(false);
+      return;
     }
+
+    if (!res.ok) {
+      setError("Failed to delete task.");
+      setIsDeleting(false);
+      return;
+    }
+
+    router.refresh();
   }
 
   return (
