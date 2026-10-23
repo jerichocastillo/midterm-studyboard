@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getGroupById, createTask } from "@/lib/data";
 import { createTaskSchema } from "@/lib/validations";
+import { emitGroup } from "@/lib/socket";
 
 // GET /api/groups/:id/tasks — list a group's tasks. Stays PUBLIC.
 export async function GET(
@@ -56,6 +57,7 @@ if (group.ownerId !== session.user.id){
     );
   }
 
-  const newTask = await createTask(params.id, body.title);
+  const newTask = await createTask(params.id, parsedResponse.data.title);
+  emitGroup(params.id, "task:created", newTask);
   return NextResponse.json(newTask, { status: 201 });
 }

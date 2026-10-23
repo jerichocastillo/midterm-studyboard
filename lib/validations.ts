@@ -3,7 +3,7 @@ import { z } from "zod";
 export const registerSchema = z.object({
     name: z.string().trim().min(1, "Name is required").max(100),
     email: z.string().trim().email("Input a valid email address"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
+    password: z.string().trim().min(8, "Password must be at least 8 characters long"),
 });
 
 export const createGroupSchema = z.object({
@@ -15,11 +15,13 @@ export const createGroupSchema = z.object({
 export const updateGroupSchema = createGroupSchema.partial();
 
 export const createTaskSchema = z.object({
-    title: z.string().trim().min(1, "Title is required").max(200),
+    title: z.string().trim().min(1, "Title is required").max(200), 
+    description: z.string().optional(),
 });
 
-
 export const updateTaskSchema = z.object({
-     title: z.string().trim().min(1, "Title is required").max(200),
-     done: z.boolean().optional(),
+    title: z.string().trim().min(1, "Title is required").max(200).optional(),
+    done: z.boolean().optional(),
+}).refine((updates) => updates.title !== undefined || updates.done !== undefined, {
+    message: "At least one task field is required",
 });

@@ -7,6 +7,7 @@ import DeleteGroupButton from "@/components/DeleteGroupButton";
 import NewTaskForm from "@/components/NewTaskForm";
 import BookSearch from "@/components/BookSearch";
 import AISubtaskSuggester from "@/components/AISubtaskSuggester";
+import RealtimeNotifications from "@/components/RealTimeNotifications";
 
 export default async function GroupDetailPage({
   params,
@@ -28,6 +29,7 @@ export default async function GroupDetailPage({
 
   return (
     <div>
+      <RealtimeNotifications groupId={group.id} />
       <h1 className="text-3xl font-bold">{group.name}</h1>
       <p className="text-gray-500">
         {group.subject} · {group.memberCount} members · Created by{" "}

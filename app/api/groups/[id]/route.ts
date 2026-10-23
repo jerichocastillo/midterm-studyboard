@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getGroupById, updateGroup, deleteGroup } from "@/lib/data";
 import { updateGroupSchema } from "@/lib/validations";
-import { error } from "console";
+import { emitGroup } from "@/lib/socket";
 
 
 // GET /api/groups/:id — read one group. Stays PUBLIC — no changes needed.
@@ -113,5 +113,6 @@ const session = await getServerSession(authOptions);
     return NextResponse.json({ error: "Group not found" }, { status: 404 });
   }
 
+  emitGroup(params.id, "group:deleted", { id: params.id });
   return NextResponse.json({ message: "Group deleted" });
 }
