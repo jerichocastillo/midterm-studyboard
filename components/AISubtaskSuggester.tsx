@@ -95,7 +95,7 @@ export default function AISubtaskSuggester({ groupId }: { groupId: string }) {
         <button
           type="submit"
           disabled={isGenerating}
-          className="whitespace-nowrap rounded-md bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 disabled:opacity-50"
+          className="whitespace-nowrap rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
         >
           {isGenerating ? "Thinking..." : "Suggest Subtasks"}
         </button>

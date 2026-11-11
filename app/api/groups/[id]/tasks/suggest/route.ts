@@ -1,18 +1,18 @@
-import axios from "axios";
-import { z } from "zod";
-import { getServerSession } from "next-auth";
+import { AIFeatureUnavailableError, AIRequestError, generateSubtaskSuggestions } from "@/lib/ai";
 import { authOptions } from "@/lib/auth";
+import { getGroupById } from "@/lib/services/groupService";
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-import { getGroupById } from "@/lib/data";
-import { AIFeatureUnavailableError, generateSubtaskSuggestions, AIRequestError, } from "@/lib/ai";
+import { z } from "zod";
+import axios from "axios";
 
 const suggestSchema = z.object({
   topic: z.string().trim().min(1, "A topic is required").max(200),
-})
+});
 
 export async function POST(
-    request: Request, 
-    {params}: {params: {id: string}}
+  request: Request,
+  { params }: { params: { id: string } }
 ) {
   const session = await getServerSession(authOptions);
   if (!session) {
@@ -30,10 +30,7 @@ export async function POST(
 
   const group = await getGroupById(params.id);
   if (!group) {
-    return NextResponse.json(
-      { error: "Group not found" }, 
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "Group not found" }, { status: 404 });
   }
 
   if (group.ownerId !== session.user.id) {
@@ -42,25 +39,28 @@ export async function POST(
       { status: 403 }
     );
   }
-  
+
   try {
-    const subtasks = await generateSubtaskSuggestions(
-      parsed.data.topic, 
-      group.id
-    );
+    const subtasks = await generateSubtaskSuggestions(parsed.data.topic, group.subject);
     return NextResponse.json({ subtasks });
-    } catch (error) {
-      if (error instanceof AIFeatureUnavailableError) {
-        return NextResponse.json(
-          { error: "AI feature is currently unavailable" },
-          { status: 503 }
-        );
-      }
-      if (axios.isAxiosError(error) || error instanceof AIRequestError) {
-            return NextResponse.json(
-                { error: "AI feature is currently unavailable, please try again later." },
-                { status: 502 }
+  } catch (error) {
+    if (error instanceof AIFeatureUnavailableError) {
+      return NextResponse.json(
+        { error: "AI feature is currently unavailable" },
+        { status: 503 }
       );
     }
+
+    if (axios.isAxiosError(error) || error instanceof AIRequestError) {
+      return NextResponse.json(
+        { error: "AI feature is currently unavailable, please try again later." },
+        { status: 502 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: "Something went wrong while generating AI suggestions" },
+      { status: 500 }
+    );
   }
 }

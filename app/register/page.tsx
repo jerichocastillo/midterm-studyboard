@@ -14,44 +14,35 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // TODO (Step 6): Implement the register submit handler.
-  // 1. Prevent default submission and clear any previous error.
-  // 2. POST to /api/register with { name, email, password } as JSON.
-  // 3. If the response is not ok, parse the error message from the body
-  //    and display it.
-  // 4. If registration succeeded, immediately sign the user in — call
-  //    signIn("credentials", { email, password, redirect: false }) so they
-  //    don't have to fill out the login form right after registering.
-  // 5. On success, router.push("/groups") and router.refresh().
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setError("TODO: implement register submit handler");
+    setError("");
     setIsSubmitting(true);
 
-    const response = await fetch("api/register", {
+    const response = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password })
+      body: JSON.stringify({ name, email, password }),
     });
 
-    if (!response.ok){
+    if (!response.ok) {
       const data = await response.json();
-      setError(data.error ?? "Something went wrong");
+      setError(data.error || "An error occurred during registration.");
       setIsSubmitting(false);
       return;
     }
 
-    const result = await signIn( "credentials", {
+    const result = await signIn("credentials", {
       email,
-      password, 
+      password,
       redirect: false,
     });
 
     setIsSubmitting(false);
 
-    if ( result?.error ) {
+    if (result?.error) {
       router.push("/login");
-        return;
+      return;
     }
 
     router.push("/groups");
@@ -104,7 +95,7 @@ export default function RegisterPage() {
             onChange={(e) => setPassword(e.target.value)}
             className="mt-1 w-full rounded-md border px-3 py-2"
           />
-          <p className="mt-1 text-xs text-gray-500">At least 8 characters.</p>
+          <p className="mt-1 text-xs text-blue-700">At least 8 characters.</p>
         </div>
 
         {error && <p className="text-sm text-red-600">{error}</p>}
@@ -114,9 +105,9 @@ export default function RegisterPage() {
         </Button>
       </form>
 
-      <p className="mt-4 text-sm text-gray-600">
+      <p className="mt-4 text-sm text-blue-800">
         Already have an account?{" "}
-        <Link href="/login" className="text-blue-600 hover:underline">
+        <Link href="/login" className="text-blue-700 hover:text-blue-950 hover:underline">
           Log in
         </Link>
       </p>

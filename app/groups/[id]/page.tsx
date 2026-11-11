@@ -1,13 +1,13 @@
 import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
-import { getGroupById } from "@/lib/data";
 import { authOptions } from "@/lib/auth";
+import { getGroupById } from "@/lib/services/groupService";
 import TaskItem from "@/components/TaskItem";
 import DeleteGroupButton from "@/components/DeleteGroupButton";
 import NewTaskForm from "@/components/NewTaskForm";
 import BookSearch from "@/components/BookSearch";
 import AISubtaskSuggester from "@/components/AISubtaskSuggester";
-import RealtimeNotifications from "@/components/RealTimeNotifications";
+import RealTimeNotifications from "@/components/RealTimeNotifications";
 
 export default async function GroupDetailPage({
   params,
@@ -19,32 +19,26 @@ export default async function GroupDetailPage({
     getServerSession(authOptions),
   ]);
 
-  // Next.js's built-in way to render the closest not-found.tsx (or a
-  // default 404) when a dynamic route doesn't match real data.
   if (!group) {
     notFound();
   }
 
-  const isOwner = session?.user.id === group.ownerId;
+  const isOwner = session?.user?.id === group.ownerId;
 
   return (
-    <div>
-      <RealtimeNotifications groupId={group.id} />
-      <h1 className="text-3xl font-bold">{group.name}</h1>
-      <p className="text-gray-500">
-        {group.subject} · {group.memberCount} members · Created by{" "}
-        {group.owner.name}
-      </p>
-
-      {isOwner && (
-        <div className="mt-4 flex flex-col gap-3">
-          <DeleteGroupButton groupId={group.id} />
-          <NewTaskForm groupId={group.id} />
+    <div className="mx-auto max-w-4xl p-6">
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-blue-950">{group.name}</h1>
+          <p className="text-sm text-blue-700">{group.subject}</p>
         </div>
-      )}
 
-      <h2 className="mt-8 text-lg font-semibold">Tasks</h2>
-      <ul className="mt-3 flex flex-col gap-2">
+        {isOwner && (
+          <DeleteGroupButton groupId={group.id} />
+        )}
+      </div>
+
+      <ul className="space-y-3">
         {group.tasks.map((task) => (
           <TaskItem
             key={task.id}
@@ -54,7 +48,7 @@ export default async function GroupDetailPage({
           />
         ))}
         {group.tasks.length === 0 && (
-          <p className="text-sm text-gray-500">No tasks yet.</p>
+          <li className="text-sm text-blue-700">No tasks yet.</li>
         )}
       </ul>
 
@@ -64,19 +58,20 @@ export default async function GroupDetailPage({
         </div>
       )}
 
-      <h2 className="mt-8 text-lg font-semibold">Reference Books</h2>
-      <p className="mt-1 text-sm text-gray-500">
-        Powered by the Open Library API - search for books related to{" "} 
+      <h2 className="mt-8 text-lg font-semibold text-blue-950">Reference Books</h2>
+      <p className="mt-1 text-sm text-blue-700">
+        Powered by the Open Library API - search for books related to{" "}
         {group.subject}.
       </p>
       <div className="mt-3">
         <BookSearch initialQuery={group.subject} />
       </div>
-      {isOwner && (
-        <div className="mt-4">
-          <AISubtaskSuggester groupId={group.id} />
-        </div>
-      )}
+        {isOwner && (
+          <div className="mt-4">
+            <AISubtaskSuggester groupId={group.id} />
+          </div>
+        )}
+        <RealTimeNotifications groupId={group.id} />
     </div>
   );
 }

@@ -73,7 +73,10 @@ function parseSubtask(text: string): string[] {
   return SubTaskSuggestions.parse(extractJson(text)).subtasks.slice(0, 6);
 }
 
-export async function generateSubtaskSuggestions(topic: string, groupSubject: string): Promise<string[]> {
+export async function generateSubtaskSuggestions(
+  topic: string,
+  groupSubject: string
+): Promise<string[]> {
   getSettings();
 
   const prompt: ChatMessage[] = [

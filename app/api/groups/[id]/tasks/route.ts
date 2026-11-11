@@ -1,16 +1,17 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getGroupById, createTask } from "@/lib/data";
+import * as groupServices from "@/lib/services/groupService";
+import * as taskService from "@/lib/services/taskService";
+import { ForbiddenError, NotFoundError } from "@/lib/errors";
 import { createTaskSchema } from "@/lib/validations";
-import { emitGroup } from "@/lib/socket";
 
 // GET /api/groups/:id/tasks — list a group's tasks. Stays PUBLIC.
 export async function GET(
-  request: Request, 
+  request: Request,
   { params }: { params: { id: string } }
 ) {
-  const group = await getGroupById(params.id);
+  const group = await groupServices.getGroupById(params.id);
 
   if (!group) {
     return NextResponse.json({ error: "Group not found" }, { status: 404 });
@@ -19,45 +20,40 @@ export async function GET(
   return NextResponse.json(group.tasks);
 }
 
-// TODO (Step 14): POST /api/groups/:id/tasks — add a task to a group.
-// Requires authentication AND ownership of the PARENT GROUP (not the task —
-// tasks don't have their own owner field, so we check via their group).
-// Follow the same 3-check pattern as PATCH /api/groups/:id in the previous file.
 export async function POST(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   const session = await getServerSession(authOptions);
 
-  if(!session){
-    return NextResponse.json(
-      {error: "Unauthorized"},
-      {status: 401}
-    );
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const body = await request.json();
   const parsedResponse = createTaskSchema.safeParse(body);
-  if ( !parsedResponse.success){
+  if (!parsedResponse.success) {
     return NextResponse.json(
       { error: parsedResponse.error.issues[0].message },
       { status: 400 }
-    )
-  }
-
-  const group = await getGroupById(params.id);
-  if (!group) {
-    return NextResponse.json({ error: "Group not found" }, { status: 404 });
-  }
-
-if (group.ownerId !== session.user.id){
-    return NextResponse.json(
-      {error: "Only the owner can add tasks to this group"},
-      {status: 403}
     );
   }
 
-  const newTask = await createTask(params.id, parsedResponse.data.title);
-  emitGroup(params.id, "task:created", newTask);
-  return NextResponse.json(newTask, { status: 201 });
+  try {
+    const newTask = await taskService.createTask(
+      params.id,
+      session.user.id,
+      parsedResponse.data.title,
+      request.headers.get("x-socket-id")
+    );
+    return NextResponse.json(newTask, { status: 201 });
+  } catch (error) {
+    if (error instanceof NotFoundError) {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: error.message }, { status: 403 });
+    }
+    throw error;
+  }
 }

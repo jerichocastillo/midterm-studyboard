@@ -16,8 +16,8 @@ export default function Button({
   const base = "px-4 py-2 rounded-md text-sm font-medium transition-colors";
   const styles =
     variant === "primary"
-      ? "bg-blue-600 text-white hover:bg-blue-700"
-      : "bg-gray-200 text-gray-800 hover:bg-gray-300";
+      ? "bg-blue-700 text-white hover:bg-blue-900"
+      : "bg-sky-100 text-blue-950 hover:bg-sky-200";
 
   return <button className={`${base} ${styles} ${className}`} {...props} />;
 }

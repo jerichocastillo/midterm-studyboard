@@ -54,7 +54,7 @@ export default function BookSearch({ initialQuery }: { initialQuery: string }) {
         <button
           type="submit"
           disabled={isLoading}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          className="rounded-md bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-900 disabled:opacity-50"
         >
           {isLoading ? "Searching..." : "Search"}
         </button>
@@ -63,7 +63,7 @@ export default function BookSearch({ initialQuery }: { initialQuery: string }) {
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
 
       {hasSearched && !isLoading && !error && results.length === 0 && (
-        <p className="mt-2 text-sm text-gray-500">No books found.</p>
+        <p className="mt-2 text-sm text-blue-800">No books found.</p>
       )}
 
       <ul className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -80,16 +80,16 @@ export default function BookSearch({ initialQuery }: { initialQuery: string }) {
                 className="mb-1 h-32 w-full rounded object-cover"
               />
             ) : (
-              <div className="mb-1 flex h-32 w-full items-center justify-center rounded bg-gray-100 text-xs text-gray-400">
+              <div className="mb-1 flex h-32 w-full items-center justify-center rounded bg-blue-100 text-xs text-blue-700">
                 No cover
               </div>
             )}
             <p className="font-medium leading-tight">{book.title}</p>
             {book.authors.length > 0 && (
-              <p className="text-gray-500">{book.authors.join(", ")}</p>
+              <p className="text-blue-800">{book.authors.join(", ")}</p>
             )}
             {book.firstPublishYear && (
-              <p className="text-gray-400">{book.firstPublishYear}</p>
+              <p className="text-blue-700">{book.firstPublishYear}</p>
             )}
           </li>
         ))}

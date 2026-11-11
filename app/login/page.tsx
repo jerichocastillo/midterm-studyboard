@@ -13,36 +13,24 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // TODO (Step 5): Implement the login submit handler.
-  // 1. Prevent the default form submission and clear any previous error.
-  // 2. Call signIn("credentials", { email, password, redirect: false }).
-  //    `redirect: false` lets you handle the result yourself instead of
-  //    NextAuth doing a full-page redirect on failure.
-  // 3. If the result has an `error` field, show a friendly error message
-  //    ("Invalid email or password.") instead of the raw NextAuth error.
-  // 4. If it succeeded, redirect to /groups with router.push(), then call
-  //    router.refresh() so the Navbar (rendered on the server) re-checks
-  //    the session and shows you as logged in.
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
     setIsSubmitting(true);
 
-    const result = await signIn( "credentials", {
+    const result = await signIn("credentials", {
       email,
       password,
       redirect: false,
     });
-
     setIsSubmitting(false);
 
-    if ( result?.error ){
+    if (result?.error) {
       setError("Invalid email or password.");
-      return;
+    } else {
+      router.push("/groups");
+      router.refresh();
     }
-
-    router.push("/groups");
-    router.refresh();
   }
 
   return (
@@ -85,9 +73,9 @@ export default function LoginPage() {
         </Button>
       </form>
 
-      <p className="mt-4 text-sm text-gray-600">
+      <p className="mt-4 text-sm text-blue-800">
         Don&apos;t have an account?{" "}
-        <Link href="/register" className="text-blue-600 hover:underline">
+        <Link href="/register" className="text-blue-700 hover:text-blue-950 hover:underline">
           Register
         </Link>
       </p>

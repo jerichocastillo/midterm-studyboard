@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Group } from "@/lib/data";
+import type { Group } from "@/lib/repositories/groupRepositories";
 
 // Purely presentational, no interactivity -> stays a Server Component.
 export default function GroupCard({ group }: { group: Group }) {
@@ -8,11 +8,11 @@ export default function GroupCard({ group }: { group: Group }) {
   return (
     <Link
       href={`/groups/${group.id}`}
-      className="block rounded-lg border p-4 hover:shadow-md transition-shadow"
+      className="block rounded-lg border bg-white p-4 transition-shadow hover:shadow-md"
     >
       <h3 className="text-lg font-semibold">{group.name}</h3>
-      <p className="text-sm text-gray-500">{group.subject}</p>
-      <div className="mt-2 flex justify-between text-sm text-gray-600">
+      <p className="text-sm text-blue-700">{group.subject}</p>
+      <div className="mt-2 flex justify-between text-sm text-blue-900">
         <span>{group.memberCount} members</span>
         <span>
           {completedCount}/{group.tasks.length} tasks done
